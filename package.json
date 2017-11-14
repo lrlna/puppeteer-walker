@@ -1,0 +1,19 @@
+{
+  "name": "puppeteer-walker",
+  "version": "1.0.0",
+  "description": "puppeteer crawler",
+  "main": "index.js",
+  "scripts": {
+    "test": "standard"
+  },
+  "keywords": [
+    "puppeteer"
+  ],
+  "author": "Irina Shestak",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "async": "^2.6.0",
+    "puppeteer": "^0.13.0",
+    "simplecrawler": "^1.1.6"
+  }
+}
