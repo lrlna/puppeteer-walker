@@ -10,4 +10,8 @@ walker.on('error', function (err) {
   console.log('error', err)
 })
 
+walker.on('end', function () {
+  console.log('finished walking')
+})
+
 walker.start('https://avocado.choo.io')

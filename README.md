@@ -11,16 +11,18 @@ var PuppeteerWalker = require('puppeteer-walker')
 var walker = new PuppeteerWalker()
 
 walker.on('page', function (page) {
-  var title = page.title()
-  console.log(`title: ${title}`)
+  var url = page.url
+  console.log(`url: ${url}`)
 })
 
-walker.on('error', fucntion (err) {
+walker.on('error', function (err) {
+  console.log('error', err)
   throw err
 })
 
 walker.on('end', fucntion () {
+  console.log('finished walking')
 })
 
-walker.walk('avocado.choo.io')
+walker.walk('https://avocado.choo.io')
 ```
