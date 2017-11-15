@@ -2,16 +2,11 @@ var Walker = require('./')
 
 var walker = Walker()
 
-walker.on('page', function (page) {
-  console.log(page.url)
+walker.on('end', () => console.log('finished walking'))
+walker.on('error', (err) => console.log('error', err))
+walker.on('page', async (page) => {
+  var title = await page.title()
+  console.log(`title: ${title}`)
 })
 
-walker.on('error', function (err) {
-  console.log('error', err)
-})
-
-walker.on('end', function () {
-  console.log('finished walking')
-})
-
-walker.start('https://avocado.choo.io')
+walker.walk('https://avocado.choo.io')

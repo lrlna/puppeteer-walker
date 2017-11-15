@@ -13,6 +13,7 @@
   "license": "Apache-2.0",
   "dependencies": {
     "async": "^2.6.0",
+    "debug": "^3.1.0",
     "puppeteer": "^0.13.0",
     "simplecrawler": "^1.1.6"
   }

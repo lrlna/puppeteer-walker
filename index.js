@@ -2,7 +2,8 @@ var EventEmitter = require('events').EventEmitter
 var puppeteer = require('puppeteer')
 var asyncjs = require('async')
 var assert = require('assert')
-var url = require('url')
+var URL = require('url').URL
+var debug = require('debug')
 
 module.exports = Walker
 
@@ -14,65 +15,80 @@ function Walker () {
 
 Walker.prototype = Object.create(EventEmitter.prototype)
 
-Walker.prototype.start = async function (initialURL) {
-  assert.ok(url.parse(initialURL).protocol, 'puppeteer-walker: a URL needs to come with a protocol, i.e. https')
+Walker.prototype.walk = async function (initialHref) {
+  var url = new URL(initialHref)
 
-  var initialHost = url.parse(initialURL).hostname
+  var debugVisited = debug('puppeteer-walker:visited')
+  var debugError = debug('puppeteer-walker:error')
+  var debugEnd = debug('puppeteer-walker:end')
+
+  assert.ok(url.protocol, 'puppeteer-walker: a URL needs to come with a protocol, i.e. https')
+
+  var initialHost = url.hostname
   var visited = new Set()
-  visited.add(initialURL)
 
   try {
     var browser = await puppeteer.launch()
     var page = await browser.newPage()
-    var currentPage = await page.goto(initialURL, { waitUntil: 'domcontentloaded' })
-    this.emit('page', currentPage)
   } catch (err) {
     this.emit('error', err)
   }
 
-  var queue = asyncjs.queue(async (href, cb) => {
+  var queue = asyncjs.queue(async (href) => {
     // only want to walk url's from same origin
-    var queueHost = url.parse(href).hostname
-    if (initialHost !== queueHost) return cb()
-
-    console.log(cb)
+    var queueHost = (new URL(href)).hostname
+    if (initialHost !== queueHost) return
 
     if (!visited.has(href)) {
       try {
-        var newPage = await page.goto(href, { waitUntil: 'domcontentloaded' })
+        await page.goto(href, { waitUntil: 'domcontentloaded' })
+        debugVisited(href)
         visited.add(href)
 
-        this.emit('page', newPage)
+        var emitPage = new Promise((resolve, reject) => {
+          this.emit('page', page, resolve)
+        })
+
+        await emitPage
 
         var newHrefs = await page.$$eval('a', function (anchors) {
           return anchors.map(anchor => anchor.href)
         })
-        queue.push(newHrefs)
-
-        return cb()
+        queue.push(newHrefs.map(escape))
       } catch (err) {
+        debugError(err)
         this.emit('error', err)
       }
     }
-
-    cb()
   })
 
   queue.drain = async () => {
     try {
       await browser.close()
+      debugEnd('end')
       this.emit('end')
     } catch (err) {
       this.emit('error', err)
     }
   }
 
-  try {
-    var hrefs = await page.$$eval('a', function (anchors) {
-      return anchors.map(anchor => anchor.href)
+  queue.push(escape(initialHref))
+
+  function escape (url) {
+    return url.replace(/\/$/, '')
+  }
+}
+
+Walker.prototype.on = function (event, cb) {
+  assert.equal(typeof event, 'string', 'puppeteer-walker.on: event should be type string')
+  if (event === 'page') {
+    assert.equal(cb.constructor.name, 'AsyncFunction', 'puppeteer-walker.on: cb should be an AsyncFunction')
+
+    EventEmitter.prototype.on.call(this, event, async function (page, resolve) {
+      await cb(page)
+      resolve()
     })
-    queue.push(hrefs)
-  } catch (err) {
-    this.emit('error', err)
+  } else {
+    EventEmitter.prototype.on.call(this, event, cb)
   }
 }
