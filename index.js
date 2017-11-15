@@ -16,13 +16,14 @@ function Walker () {
 Walker.prototype = Object.create(EventEmitter.prototype)
 
 Walker.prototype.walk = async function (initialHref) {
+  assert.equal(typeof initialHref, 'string', 'puppeteer-walker.walk: initialHref needs to be type string')
+
   var url = new URL(initialHref)
+  assert.ok(url.protocol, 'puppeteer-walker.walk: a URL needs to come with a protocol, i.e. https')
 
   var debugVisited = debug('puppeteer-walker:visited')
   var debugError = debug('puppeteer-walker:error')
   var debugEnd = debug('puppeteer-walker:end')
-
-  assert.ok(url.protocol, 'puppeteer-walker: a URL needs to come with a protocol, i.e. https')
 
   var initialHost = url.hostname
   var visited = new Set()
