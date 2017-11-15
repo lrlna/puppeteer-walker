@@ -1,6 +1,6 @@
 {
   "name": "puppeteer-walker",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "puppeteer crawler",
   "main": "index.js",
   "scripts": {
