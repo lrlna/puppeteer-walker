@@ -24,19 +24,22 @@ walker.walk('https://avocado.choo.io')
 ```
 
 ## API
-### `walker = PuppeteerWalker()` 
+### `walker = PuppeteerWalker()`
 Create a new walker instance.
 
-### `walker.on('page', async cb(Page))`
+### `walker.on('page', async cb(Page, push))`
 Listen to a `page` event. Returns an instance of the puppeteer [Page
 Class](https://github.com/GoogleChrome/puppeteer/blob/master/docs/api.md#class-page).
 The `callback` has to be an Async Function.
 
+Use the `push(url)` method to add more pages into the internal walker queue.
+This is useful for busting past login forms, and the like.
+
 ### `walker.on('error', cb(err))`
-Listen to `error` events. 
+Listen to `error` events.
 
 ### `walker.on('end', cb)`
-Listen to an `end` event. 
+Listen to an `end` event.
 
 ### `walker.walk(url)`
 Start walking the URL.
