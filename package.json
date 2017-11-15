@@ -4,7 +4,8 @@
   "description": "puppeteer crawler",
   "main": "index.js",
   "scripts": {
-    "test": "standard"
+    "test": "standard",
+    "start": "node ./example.js"
   },
   "keywords": [
     "puppeteer",

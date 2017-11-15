@@ -10,6 +10,10 @@ module.exports = Walker
 function Walker () {
   if (!(this instanceof Walker)) return new Walker()
 
+  this.debugVisited = debug('puppeteer-walker:visited')
+  this.debugError = debug('puppeteer-walker:error')
+  this.debugEnd = debug('puppeteer-walker:end')
+
   EventEmitter.call(this)
 }
 
@@ -20,10 +24,6 @@ Walker.prototype.walk = async function (initialHref) {
 
   var url = new URL(initialHref)
   assert.ok(url.protocol, 'puppeteer-walker.walk: a URL needs to come with a protocol, i.e. https')
-
-  var debugVisited = debug('puppeteer-walker:visited')
-  var debugError = debug('puppeteer-walker:error')
-  var debugEnd = debug('puppeteer-walker:end')
 
   var initialHost = url.hostname
   var visited = new Set()
@@ -43,7 +43,7 @@ Walker.prototype.walk = async function (initialHref) {
     if (!visited.has(href)) {
       try {
         await page.goto(href, { waitUntil: 'domcontentloaded' })
-        debugVisited(href)
+        this.debugVisited(href)
         visited.add(href)
 
         var emitPage = new Promise((resolve, reject) => {
@@ -60,7 +60,7 @@ Walker.prototype.walk = async function (initialHref) {
         })
         queue.push(newHrefs.map(escape))
       } catch (err) {
-        debugError(err)
+        this.debugError(err)
         this.emit('error', err)
       }
     }
@@ -69,7 +69,7 @@ Walker.prototype.walk = async function (initialHref) {
   queue.drain = async () => {
     try {
       await browser.close()
-      debugEnd('end')
+      this.debugEnd('end')
       this.emit('end')
     } catch (err) {
       this.emit('error', err)
@@ -88,8 +88,14 @@ Walker.prototype.on = function (event, cb) {
   if (event === 'page') {
     assert.equal(cb.constructor.name, 'AsyncFunction', 'puppeteer-walker.on: cb should be an AsyncFunction')
 
+    var self = this
     EventEmitter.prototype.on.call(this, event, async function (page, resolve, push) {
-      await cb(page, push)
+      try {
+        await cb(page, push)
+      } catch (err) {
+        self.debugError(err)
+        self.emit('error', err)
+      }
       resolve()
     })
   } else {
