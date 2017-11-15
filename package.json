@@ -1,13 +1,22 @@
 {
   "name": "puppeteer-walker",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "puppeteer crawler",
   "main": "index.js",
   "scripts": {
     "test": "standard"
   },
   "keywords": [
-    "puppeteer"
+    "puppeteer",
+    "crawler",
+    "index",
+    "visit",
+    "spider",
+    "crawl",
+    "modern",
+    "google",
+    "headless",
+    "chrome"
   ],
   "repository": "lrlna/puppeteer-walker",
   "author": "Irina Shestak",
@@ -15,8 +24,7 @@
   "dependencies": {
     "async": "^2.6.0",
     "debug": "^3.1.0",
-    "puppeteer": "^0.13.0",
-    "simplecrawler": "^1.1.6"
+    "puppeteer": "^0.13.0"
   },
   "devDependencies": {
     "standard": "^10.0.3"
