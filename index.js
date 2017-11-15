@@ -46,7 +46,10 @@ Walker.prototype.walk = async function (initialHref) {
         visited.add(href)
 
         var emitPage = new Promise((resolve, reject) => {
-          this.emit('page', page, resolve)
+          this.emit('page', page, resolve, push)
+          function push (url) {
+            queue.push(escape(url))
+          }
         })
 
         await emitPage
@@ -84,8 +87,8 @@ Walker.prototype.on = function (event, cb) {
   if (event === 'page') {
     assert.equal(cb.constructor.name, 'AsyncFunction', 'puppeteer-walker.on: cb should be an AsyncFunction')
 
-    EventEmitter.prototype.on.call(this, event, async function (page, resolve) {
-      await cb(page)
+    EventEmitter.prototype.on.call(this, event, async function (page, resolve, push) {
+      await cb(page, push)
       resolve()
     })
   } else {
