@@ -9,6 +9,7 @@
   "keywords": [
     "puppeteer"
   ],
+  "repository": "lrlna/puppeteer-walker",
   "author": "Irina Shestak",
   "license": "Apache-2.0",
   "dependencies": {
@@ -16,5 +17,8 @@
     "debug": "^3.1.0",
     "puppeteer": "^0.13.0",
     "simplecrawler": "^1.1.6"
+  },
+  "devDependencies": {
+    "standard": "^10.0.3"
   }
 }
