@@ -19,7 +19,7 @@ function Walker () {
 
 Walker.prototype = Object.create(EventEmitter.prototype)
 
-Walker.prototype.walk = async function (initialHref) {
+Walker.prototype.walk = async function (initialHref, options) {
   assert.equal(typeof initialHref, 'string', 'puppeteer-walker.walk: initialHref needs to be type string')
 
   var url = new URL(initialHref)
@@ -29,7 +29,7 @@ Walker.prototype.walk = async function (initialHref) {
   var visited = new Set()
 
   try {
-    var browser = await puppeteer.launch()
+    var browser = await puppeteer.launch(options || {})
     var page = await browser.newPage()
   } catch (err) {
     this.emit('error', err)
