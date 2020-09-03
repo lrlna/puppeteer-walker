@@ -25,7 +25,7 @@
   "dependencies": {
     "async": "^2.6.0",
     "debug": "^3.1.0",
-    "puppeteer": "^0.13.0"
+    "puppeteer": "^5.2.1"
   },
   "devDependencies": {
     "standard": "^10.0.3"
